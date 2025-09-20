@@ -11,10 +11,10 @@ public class WaveManager : MonoBehaviour
         public string name;
         public int reward;
     }
-
+    
     public GameObject enemyPrefab;
     public Transform spawnPoint;
-
+    public List<EnemyBlueprint> enemyList;
     [Header("Wave Setup")]
     public int enemiesPerWave = 20;
     public int minReward = 5;
@@ -46,14 +46,14 @@ public class WaveManager : MonoBehaviour
         var ordered = filtered.OrderByDescending(e => e.reward);
 
         // LINQ ToList
-        var finalWave = ordered.ToList();
-
+        enemyList = ordered.ToList();
+        
         // Aggregate (actual: suma total de recompensas)
-        int totalGold = finalWave.Aggregate(0, (acum, e) => acum + e.reward);
-        Debug.Log($"Wave generada: {finalWave.Count} enemigos | Oro total esperado: {totalGold}");
+        int totalGold = enemyList.Aggregate(0, (acum, e) => acum + e.reward);
+        Debug.Log($"Wave generada: {enemyList.Count} enemigos | Oro total esperado: {totalGold}");
 
         // Time slicing
-        StartCoroutine(SpawnInBatches(finalWave, batchSize, perSpawnDelay));
+        StartCoroutine(SpawnInBatches(enemyList, batchSize, perSpawnDelay));
     }
 
     IEnumerator SpawnInBatches(List<EnemyBlueprint> wave, int chunk, float delay)
