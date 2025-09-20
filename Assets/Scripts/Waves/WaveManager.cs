@@ -98,4 +98,25 @@ public class WaveManager : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(spawnPoint.position, 0.25f);
     }
+    
+    //Gizmos del path
+    void OnDrawGizmos()
+    {
+        if (waypoints == null || waypoints.Count == 0) return;
+    
+        Gizmos.color = Color.cyan;
+        foreach (var wp in waypoints)
+        {
+            if (wp != null)
+                Gizmos.DrawSphere(wp.position, 0.2f);
+        }
+        
+        Gizmos.color = Color.green;
+        for (int i = 0; i < waypoints.Count - 1; i++)
+        {
+            if (waypoints[i] != null && waypoints[i + 1] != null)
+                Gizmos.DrawLine(waypoints[i].position, waypoints[i + 1].position);
+        }
+    }
+
 }
