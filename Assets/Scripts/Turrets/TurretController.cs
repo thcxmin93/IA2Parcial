@@ -33,6 +33,7 @@ public class TurretController : MonoBehaviour
         {
             turretName = $"Turret_{GetInstanceID()}";
         }
+
         StartCoroutine(AnalyzeDamageOverTime());
     }
 
@@ -42,16 +43,19 @@ public class TurretController : MonoBehaviour
             return;
 
         var allEnemies = FindObjectsOfType<Enemy>(); //Agarra a todos los enemigos
-        
+
         //Mar LINQ
         if (isDebuffTurret) //Desahbilitar la curacion
         {
-            var closestBlockEnemies= allEnemies
+            var closestBlockEnemies = allEnemies
                 .OfType<BlockEnemy>() // Los cambia a block enemy siempre q peuda,  si es optro enemigo no
-                .OrderBy(blockEnemy => Vector3.Distance(transform.position, blockEnemy.transform.position)) //Los ordena en base a la distancia, de la la torre a toddos los enemigoss, del mas cercano al mas lejano
+                .OrderBy(blockEnemy =>
+                    Vector3.Distance(transform.position,
+                        blockEnemy.transform
+                            .position)) //Los ordena en base a la distancia, de la la torre a toddos los enemigoss, del mas cercano al mas lejano
                 .FirstOrDefault(); //Agarrael primero, depsues de ordenarlos, si no hay niguno tira un null
 
-            if (closestBlockEnemies!=null)
+            if (closestBlockEnemies != null)
             {
                 closestBlockEnemies.StopHealth(); // Puede accederlo xq antes lo estamos casteando a blockEnemy
             }
@@ -132,5 +136,24 @@ public class TurretController : MonoBehaviour
                 }
             }
         }
+    }
+
+    //LINQ
+    public float CalculateTurretEfficiency() // Agarra las stasts de la torreta
+    {
+        var recentDamage = stats.damageTimeline
+            .Skip(Mathf.Max(0, stats.damageTimeline.Count - 10)) // agarra los ultimos 10 da;os q hizo
+            .OrderBy(tuple => tuple.time) // Los ordena en base al tiempo
+            .ToDictionary(tuple => tuple.time, tuple => tuple.damage); // Los hace diccionario
+
+        if (recentDamage.Count == 0) return 0f;
+
+        float totalRecentDamage = recentDamage.Values.Sum();
+        float timeSpan = recentDamage.Keys.Max() - recentDamage.Keys.Min();
+
+        float efficiency = timeSpan > 0 ? totalRecentDamage / timeSpan : totalRecentDamage;
+
+        Debug.Log($"[{turretName}] Current Efficiency: {efficiency:F2} DPS");
+        return efficiency;
     }
 }
