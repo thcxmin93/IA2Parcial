@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 // AGGREGATE: Combines total damage and kills data
@@ -22,19 +23,21 @@ public class TurretController : MonoBehaviour
     [Header("Turret Settings")] public string turretName = "Turret";
     public float range = 5f;
     public float fireRate = 1f;
-
+    public TMP_Text tuttetDPS;
     public TurretStats stats = new TurretStats();
     private float lastShotTime = 0f;
     public bool isDebuffTurret;
 
     void Start()
     {
+        CalculateTurretEfficiency();
         if (string.IsNullOrEmpty(turretName))
         {
             turretName = $"Turret_{GetInstanceID()}";
         }
 
         StartCoroutine(AnalyzeDamageOverTime());
+        InvokeRepeating(nameof(CalculateTurretEfficiency), 8f, 8f);
     }
 
     void Update()
@@ -139,14 +142,14 @@ public class TurretController : MonoBehaviour
     }
 
     //LINQ
-    public float CalculateTurretEfficiency() // Agarra las stasts de la torreta
+    public void CalculateTurretEfficiency() // Agarra las stasts de la torreta
     {
         var recentDamage = stats.damageTimeline
             .Skip(Mathf.Max(0, stats.damageTimeline.Count - 10)) // agarra los ultimos 10 da;os q hizo
             .OrderBy(tuple => tuple.time) // Los ordena en base al tiempo
             .ToDictionary(tuple => tuple.time, tuple => tuple.damage); // Los hace diccionario
 
-        if (recentDamage.Count == 0) return 0f;
+        if (recentDamage.Count == 0) return;
 
         float totalRecentDamage = recentDamage.Values.Sum();
         float timeSpan = recentDamage.Keys.Max() - recentDamage.Keys.Min();
@@ -154,6 +157,6 @@ public class TurretController : MonoBehaviour
         float efficiency = timeSpan > 0 ? totalRecentDamage / timeSpan : totalRecentDamage;
 
         Debug.Log($"[{turretName}] Current Efficiency: {efficiency:F2} DPS");
-        return efficiency;
+        tuttetDPS.text = $"{efficiency:F2} DPS";
     }
 }
