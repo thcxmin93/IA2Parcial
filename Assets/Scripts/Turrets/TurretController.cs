@@ -40,7 +40,7 @@ public class TurretController : MonoBehaviour
         if (Time.time - lastShotTime < 1f / fireRate)
             return;
 
-        var allEnemies = FindObjectsOfType<BlockEnemy>();
+        var allEnemies = FindObjectsOfType<Enemy>();
 
         var targets = allEnemies
             .Where(enemy => enemy.IsAlive)
@@ -55,7 +55,7 @@ public class TurretController : MonoBehaviour
         }
     }
 
-    void AttackTarget(BlockEnemy target)
+    void AttackTarget(Enemy target)
     {
         float damage = 20f;
         bool enemyWasAlive = target.health > 0;

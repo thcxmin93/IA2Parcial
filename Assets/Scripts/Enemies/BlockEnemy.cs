@@ -7,10 +7,8 @@ using Random = UnityEngine.Random;
 
 public class BlockEnemy : Enemy
 {
-    public int reward;
     private Coroutine healthCoroutine;
-    public bool IsAlive => health > 0;
-    [SerializeField] private TMP_Text _lifeEnemy;
+   
 
     private void Start()
     {
@@ -20,9 +18,9 @@ public class BlockEnemy : Enemy
         items.Add("Coin");
     }
 
-    private void Update()
+    protected override void Update()
     {
-        _lifeEnemy.text = health.ToString();
+        base.Update(); //LLama al update del objeto padre
         if (IsAlive == false)
         {
             var loot = LootGenerator(Random.Range(0, 3)); // te devuelve el valor del loot q te dio
@@ -32,7 +30,6 @@ public class BlockEnemy : Enemy
         }
     }
     
-
     //Time - Slicing
     private IEnumerator HealthUpgrade() //Corrutina para curar a los enemigos
     {

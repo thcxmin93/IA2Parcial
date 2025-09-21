@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class WaveManager : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class WaveManager : MonoBehaviour
         public int reward;
     }
     
-    public GameObject enemyPrefab;
+    public List<GameObject> enemyPrefabs;
     public Transform spawnPoint;
     public List<EnemyBlueprint> enemyList;
     [Header("Wave Setup")]
@@ -67,10 +68,10 @@ public class WaveManager : MonoBehaviour
             {
                 Vector3 pos = spawnPoint ? spawnPoint.position : Vector3.zero;
 
-                var go = Instantiate(enemyPrefab, pos, Quaternion.identity);
+                var go = Instantiate(GenerateRandomEnemy().First(), pos, Quaternion.identity);
                 go.name = data.name;
 
-                var be = go.GetComponent<BlockEnemy>();
+                var be = go.GetComponent<Enemy>();
                 if (be != null)
                     be.reward = data.reward;
 
@@ -89,6 +90,15 @@ public class WaveManager : MonoBehaviour
             }
 
             spawned += slice.Count;
+        }
+    }
+    
+    public IEnumerable<GameObject> GenerateRandomEnemy()
+    {
+        while (true)
+        {
+            int skipAmount = Random.Range(0, enemyPrefabs.Count());
+            yield return enemyPrefabs.Skip(skipAmount).First();
         }
     }
 
