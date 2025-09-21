@@ -5,14 +5,11 @@ using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class BlockEnemy : MonoBehaviour
+public class BlockEnemy : Enemy
 {
     public int reward;
-    public float health = 100f;
     private Coroutine healthCoroutine;
     public bool IsAlive => health > 0;
-    public List<string> items = new();
-
     [SerializeField] private TMP_Text _lifeEnemy;
 
     private void Start()
@@ -34,16 +31,7 @@ public class BlockEnemy : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
-    //MAR
-    //Generator de items 
-    private IEnumerable<string> LootGenerator(int itemsLoot)
-    {
-        for (int i = 0; i < itemsLoot; i++)
-        {
-            yield return items[UnityEngine.Random.Range(0, items.Count)];
-        }
-    }
+    
 
     //Time - Slicing
     private IEnumerator HealthUpgrade() //Corrutina para curar a los enemigos
