@@ -9,9 +9,25 @@ public class UICanvas : MonoBehaviour
 {
     [SerializeField] private WaveManager _WaveManager;
     [SerializeField] private TMP_Text _textEnemies;
-    
+    [SerializeField] private TMP_Text _itemsLoot;
+    public static UICanvas Instance; //Variable unica q se puede acceder a nivel global
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     private void Update()
     {
         _textEnemies.text = $"Enemies: {(_WaveManager.enemyList.Count)}";
+    }
+
+    public void SetLootUI(IEnumerable<string> lootColection)
+    {
+        foreach (var item in lootColection)
+        {
+            _itemsLoot.text+= $"{item}\n";
+        }
+       
     }
 }

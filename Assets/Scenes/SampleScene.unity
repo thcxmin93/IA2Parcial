@@ -1336,6 +1336,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3973577116559951061, guid: 57b5ea8fd2d403f46809f19cc925d696,
         type: 3}
+      propertyPath: _itemsLoot
+      value: 
+      objectReference: {fileID: 7741238814378803174}
+    - target: {fileID: 3973577116559951061, guid: 57b5ea8fd2d403f46809f19cc925d696,
+        type: 3}
       propertyPath: _WaveManager
       value: 
       objectReference: {fileID: 2001711620}
@@ -1454,6 +1459,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 57b5ea8fd2d403f46809f19cc925d696, type: 3}
+--- !u!114 &7741238814378803174 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8515107231200195317, guid: 57b5ea8fd2d403f46809f19cc925d696,
+    type: 3}
+  m_PrefabInstance: {fileID: 7741238814378803173}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
