@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 public class BlockEnemy : Enemy
 {
     private Coroutine healthCoroutine;
-   
+
 
     private void Start()
     {
@@ -25,11 +25,22 @@ public class BlockEnemy : Enemy
         {
             var loot = LootGenerator(Random.Range(0, 3)); // te devuelve el valor del loot q te dio
             UICanvas.Instance.SetLootUI(loot); // Busca la UICanvas y ejecuta su funcion para actualsizar el canvas
-            StopCoroutine(healthCoroutine); //Se frena la corrutina cuando mure para q no lopee infinitamente
+            if (healthCoroutine != null)
+            {
+                StopCoroutine(healthCoroutine);
+            } //Se frena la corrutina cuando mure para q no lopee infinitamente
             Destroy(gameObject);
         }
     }
-    
+
+    public void StopHealth()
+    {
+        if (healthCoroutine != null)
+        {
+            StopCoroutine(healthCoroutine);
+        }
+    }
+
     //Time - Slicing
     private IEnumerator HealthUpgrade() //Corrutina para curar a los enemigos
     {

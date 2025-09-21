@@ -12,12 +12,11 @@ public class WaveManager : MonoBehaviour
         public string name;
         public int reward;
     }
-    
+
     public List<GameObject> enemyPrefabs;
     public Transform spawnPoint;
     public List<EnemyBlueprint> enemyList;
-    [Header("Wave Setup")]
-    public int enemiesPerWave = 20;
+    [Header("Wave Setup")] public int enemiesPerWave = 20;
     public int minReward = 5;
     public int maxReward = 21;
     public int minRewardFilter = 10;
@@ -25,8 +24,7 @@ public class WaveManager : MonoBehaviour
     public int batchSize = 1;
     public float perSpawnDelay = 1f;
 
-    [Header("Path")]
-    public List<Transform> waypoints = new List<Transform>();
+    [Header("Path")] public List<Transform> waypoints = new List<Transform>();
     public float enemySpeed = 3f;
 
     void Start()
@@ -48,7 +46,7 @@ public class WaveManager : MonoBehaviour
 
         // LINQ ToList
         enemyList = ordered.ToList();
-        
+
         // Aggregate (actual: suma total de recompensas)
         int totalGold = enemyList.Aggregate(0, (acum, e) => acum + e.reward);
         Debug.Log($"Wave generada: {enemyList.Count} enemigos | Oro total esperado: {totalGold}");
@@ -68,7 +66,7 @@ public class WaveManager : MonoBehaviour
             {
                 Vector3 pos = spawnPoint ? spawnPoint.position : Vector3.zero;
 
-                var go = Instantiate(GenerateRandomEnemy().First(), pos, Quaternion.identity);
+                var go = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], pos, Quaternion.identity);
                 go.name = data.name;
 
                 var be = go.GetComponent<Enemy>();
@@ -92,15 +90,7 @@ public class WaveManager : MonoBehaviour
             spawned += slice.Count;
         }
     }
-    
-    public IEnumerable<GameObject> GenerateRandomEnemy()
-    {
-        while (true)
-        {
-            int skipAmount = Random.Range(0, enemyPrefabs.Count());
-            yield return enemyPrefabs.Skip(skipAmount).First();
-        }
-    }
+
 
     void OnDrawGizmosSelected()
     {
@@ -108,19 +98,19 @@ public class WaveManager : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(spawnPoint.position, 0.25f);
     }
-    
+
     //Gizmos del path
     void OnDrawGizmos()
     {
         if (waypoints == null || waypoints.Count == 0) return;
-    
+
         Gizmos.color = Color.cyan;
         foreach (var wp in waypoints)
         {
             if (wp != null)
                 Gizmos.DrawSphere(wp.position, 0.2f);
         }
-        
+
         Gizmos.color = Color.green;
         for (int i = 0; i < waypoints.Count - 1; i++)
         {
@@ -128,5 +118,4 @@ public class WaveManager : MonoBehaviour
                 Gizmos.DrawLine(waypoints[i].position, waypoints[i + 1].position);
         }
     }
-
 }

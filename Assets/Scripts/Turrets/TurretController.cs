@@ -25,6 +25,7 @@ public class TurretController : MonoBehaviour
 
     public TurretStats stats = new TurretStats();
     private float lastShotTime = 0f;
+    public bool isDebuffTurret;
 
     void Start()
     {
@@ -40,18 +41,35 @@ public class TurretController : MonoBehaviour
         if (Time.time - lastShotTime < 1f / fireRate)
             return;
 
-        var allEnemies = FindObjectsOfType<Enemy>();
-
-        var targets = allEnemies
-            .Where(enemy => enemy.IsAlive)
-            .Where(enemy => Vector3.Distance(transform.position, enemy.transform.position) < range)
-            .OrderBy(enemy => Vector3.Distance(transform.position, enemy.transform.position))
-            .ToList();
-
-        if (targets.Any())
+        var allEnemies = FindObjectsOfType<Enemy>(); //Agarra a todos los enemigos
+        
+        //Mar LINQ
+        if (isDebuffTurret) //Desahbilitar la curacion
         {
-            AttackTarget(targets.First());
-            lastShotTime = Time.time;
+            var closestBlockEnemies= allEnemies
+                .OfType<BlockEnemy>() // Los cambia a block enemy siempre q peuda,  si es optro enemigo no
+                .OrderBy(blockEnemy => Vector3.Distance(transform.position, blockEnemy.transform.position)) //Los ordena en base a la distancia, de la la torre a toddos los enemigoss, del mas cercano al mas lejano
+                .FirstOrDefault(); //Agarrael primero, depsues de ordenarlos, si no hay niguno tira un null
+
+            if (closestBlockEnemies!=null)
+            {
+                closestBlockEnemies.StopHealth(); // Puede accederlo xq antes lo estamos casteando a blockEnemy
+            }
+        }
+        //
+        else
+        {
+            var targets = allEnemies
+                .Where(enemy => enemy.IsAlive)
+                .Where(enemy => Vector3.Distance(transform.position, enemy.transform.position) < range)
+                .OrderBy(enemy => Vector3.Distance(transform.position, enemy.transform.position))
+                .ToList();
+
+            if (targets.Any())
+            {
+                AttackTarget(targets.First());
+                lastShotTime = Time.time;
+            }
         }
     }
 
