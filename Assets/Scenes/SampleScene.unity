@@ -175,6 +175,7 @@ MonoBehaviour:
     totalDamage: 0
     kills: 0
     damageHistory: []
+  isDebuffTurret: 0
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -513,6 +514,7 @@ MonoBehaviour:
     totalDamage: 0
     kills: 0
     damageHistory: []
+  isDebuffTurret: 0
 --- !u!1 &750314510
 GameObject:
   m_ObjectHideFlags: 0
@@ -1272,6 +1274,11 @@ PrefabInstance:
       propertyPath: _textEnemies
       value: 
       objectReference: {fileID: 1748450523}
+    - target: {fileID: 3973577116559951061, guid: 57b5ea8fd2d403f46809f19cc925d696,
+        type: 3}
+      propertyPath: _enemyAnalyzed
+      value: 
+      objectReference: {fileID: 7741238814378803174}
     - target: {fileID: 4683732334854749800, guid: 57b5ea8fd2d403f46809f19cc925d696,
         type: 3}
       propertyPath: m_Name

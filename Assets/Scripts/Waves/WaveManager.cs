@@ -53,6 +53,8 @@ public class WaveManager : MonoBehaviour
 
         // Time slicing
         StartCoroutine(SpawnInBatches(enemyList, batchSize, perSpawnDelay));
+
+        InvokeRepeating(nameof(AnalyzeWaveComposition), 3f, 10f);
     }
 
     IEnumerator SpawnInBatches(List<EnemyBlueprint> wave, int chunk, float delay)
@@ -91,6 +93,31 @@ public class WaveManager : MonoBehaviour
         }
     }
 
+    //  MAR LINQ
+    public void AnalyzeWaveComposition()
+    {
+        var allSpawnedEnemies = FindObjectsOfType<Enemy>().Select(e => e.gameObject).ToList();
+        //Busca a los enemigos, transforema todos los datos a gameobjects de enemigos, y depsues los hace una lista
+
+        var enemyAnalysis = allSpawnedEnemies
+            .Where(go => go.GetComponent<Enemy>() != null) // filtra a todo lo q tenga componente enemy
+            .OrderByDescending(go =>
+                go.GetComponent<Enemy>().reward) // ordena de mayor a  menor, en base a su recompensa
+            .ToArray(); // los hace un array
+
+
+        if (enemyAnalysis.Length > 0)
+        {
+            var topEnemy = enemyAnalysis[0].GetComponent<Enemy>();
+            UICanvas.Instance.SetEnemiesAnalyzed($"Total enemies analyzed: {enemyAnalysis.Length}\n" +
+                                                 $"Highest value target: {enemyAnalysis[0].name} with {topEnemy.reward} gold");
+        }
+        else
+        {
+            UICanvas.Instance.SetEnemiesAnalyzed("No enemy to analyzed");
+        }
+    }
+    //
 
     void OnDrawGizmosSelected()
     {
