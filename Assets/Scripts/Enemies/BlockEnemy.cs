@@ -26,8 +26,8 @@ public class BlockEnemy : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
-    //Generator de items
+    //MAR
+    //Generator de items 
     private IEnumerable<string> LootGenerator(int itemsLoot)
     {
         for (int i = 0; i < itemsLoot; i++)
