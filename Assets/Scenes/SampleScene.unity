@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.3069224, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -180,7 +180,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed79870b224bd2468fbfc66d5e721f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turretName: bangarang
+  turretName: Turret Iz
   range: 5
   fireRate: 1
   tuttetDPS: {fileID: 1440511523}
@@ -520,7 +520,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed79870b224bd2468fbfc66d5e721f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turretName: piumpium
+  turretName: TurretDer
   range: 5
   fireRate: 1
   tuttetDPS: {fileID: 1803091487}
