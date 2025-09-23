@@ -16,10 +16,6 @@ public class WaveManager : MonoBehaviour
     public List<GameObject> enemyPrefabs;
     public Transform spawnPoint;
     public List<EnemyBlueprint> enemyList;
-
-    // TUPLA : Lista de enemigos spawneados con su posición y recompensa
-    public List<(GameObject enemy, Vector3 spawnPosition, int reward)> spawnedEnemyData = new List<(GameObject, Vector3, int)>();
-
     [Header("Wave Setup")] public int enemiesPerWave = 20;
     public int minReward = 5;
     public int maxReward = 21;
@@ -33,14 +29,10 @@ public class WaveManager : MonoBehaviour
 
     void Start()
     {
+        //Pedro
+
         // Generator
-        var rawWave = Enumerable.Range(1, enemiesPerWave)
-            .Select(i => new EnemyBlueprint
-            {
-                name = $"Enemy_{i}",
-                reward = Random.Range(minReward, maxReward)
-            })
-            .ToList();
+        var rawWave = GenerateEnemyWave(enemiesPerWave, minReward, maxReward).ToList();
 
         // LINQ Where
         var filtered = rawWave.Where(e => e.reward >= minRewardFilter);
@@ -51,17 +43,44 @@ public class WaveManager : MonoBehaviour
         // LINQ ToList
         enemyList = ordered.ToList();
 
-        // Aggregate (actual: suma total de recompensas)
-        int totalGold = enemyList.Aggregate(0, (acum, e) => acum + e.reward);
-        Debug.Log($"Wave generada: {enemyList.Count} enemigos | Oro total esperado: {totalGold}");
+        // Aggregate
+        var waveAnalysis = enemyList.Aggregate(
+            new { TotalGold = 0, HighValueCount = 0 },
+            (acc, enemy) => new
+            {
+                TotalGold = acc.TotalGold + enemy.reward,
+                HighValueCount = acc.HighValueCount + (enemy.reward >= 15 ? 1 : 0)
+            },
+            result => new
+            {
+                result.TotalGold,
+                result.HighValueCount,
+                ElitePercentage = enemyList.Count > 0 ? (result.HighValueCount * 100f) / enemyList.Count : 0f
+            }
+        );
+
+        Debug.Log($"Wave generada: {enemyList.Count} enemigos | Oro total: {waveAnalysis.TotalGold}");
+        Debug.Log($"Enemigos élite (≥15 oro): {waveAnalysis.HighValueCount} ({waveAnalysis.ElitePercentage:F1}%)");
 
         // Time slicing
         StartCoroutine(SpawnInBatches(enemyList, batchSize, perSpawnDelay));
 
+        
         InvokeRepeating(nameof(AnalyzeWaveComposition), 3f, 10f);
-        InvokeRepeating(nameof(AnalyzeSpawnedEnemyPositions), 5f, 8f); // NUEVO: Analiza posiciones usando tuplas
     }
-
+    
+    private IEnumerable<EnemyBlueprint> GenerateEnemyWave(int count, int minReward, int maxReward)
+    {
+        for (int i = 1; i <= count; i++)
+        {
+            yield return new EnemyBlueprint
+            {
+                name = $"Enemy_{i}",
+                reward = Random.Range(minReward, maxReward)
+            };
+        }
+    }
+    
     IEnumerator SpawnInBatches(List<EnemyBlueprint> wave, int chunk, float delay)
     {
         int spawned = 0;
@@ -86,10 +105,7 @@ public class WaveManager : MonoBehaviour
 
                 follower.Init(waypoints, enemySpeed);
 
-                // TUPLA MAR: Guarda el enemigo, su posición de spawn y recompensa
-                spawnedEnemyData.Add((go, pos, data.reward));
-
-                Debug.Log($"SPAWN {go.name} → {data.reward} Gold at position {pos}");
+                Debug.Log($"SPAWN {go.name} → {data.reward} Gold");
 
                 if (delay > 0f)
                     yield return new WaitForSeconds(delay);
@@ -99,7 +115,7 @@ public class WaveManager : MonoBehaviour
 
             spawned += slice.Count;
         }
-    }
+    }//end Pedro
 
     //  MAR LINQ
     public void AnalyzeWaveComposition()
@@ -122,40 +138,6 @@ public class WaveManager : MonoBehaviour
         else
         {
             UICanvas.Instance.SetEnemiesAnalyzed("No enemy to analyzed");
-        }
-    }
-
-    // FUNCIÓN CON TUPLAS : Analiza posiciones de spawn y recompensas
-    public void AnalyzeSpawnedEnemyPositions()
-    {
-        if (spawnedEnemyData.Count == 0) return;
-
-        // Filtrar solo enemigos que aún existen
-        var activeEnemyData = spawnedEnemyData
-            .Where(tuple => tuple.enemy != null) // Filtrar enemigos que no fueron destruidos
-            .ToList();
-
-        if (activeEnemyData.Count > 0)
-        {
-            // Usar las tuplas para análisis
-            var highValueEnemies = activeEnemyData
-                .Where(tuple => tuple.reward > 15) // Usar tupla.reward
-                .OrderBy(tuple => Vector3.Distance(Vector3.zero, tuple.spawnPosition)) // Usar tupla.spawnPosition
-                .ToList();
-
-            if (highValueEnemies.Any())
-            {
-                var closestHighValue = highValueEnemies.First();
-                Debug.Log($"[Wave Analysis] High-value enemy closest to origin: {closestHighValue.enemy.name} " +
-                         $"with {closestHighValue.reward} gold, spawned at {closestHighValue.spawnPosition}");
-            }
-
-            // Estadísticas usando tuplas
-            var avgReward = activeEnemyData.Average(tuple => tuple.reward);
-            float avgDistanceFromOrigin = (float)activeEnemyData.Average(tuple => Vector3.Distance(Vector3.zero, tuple.spawnPosition));
-
-            Debug.Log($"[Spawn Stats] Active enemies: {activeEnemyData.Count}, " +
-                     $"Avg reward: {avgReward:F1}, Avg spawn distance: {avgDistanceFromOrigin:F1}");
         }
     }
 
