@@ -4,7 +4,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 
- 
+
 [System.Serializable]
 public class TurretStats
 {
@@ -12,7 +12,7 @@ public class TurretStats
     public int kills = 0;
     public List<float> damageHistory = new List<float>();
 
- 
+
     public List<(float damage, float time)> damageTimeline = new List<(float, float)>();
 
     public float DamagePerKill => kills > 0 ? totalDamage / kills : totalDamage;
@@ -37,10 +37,11 @@ public class TurretController : MonoBehaviour
         }
 
         StartCoroutine(AnalyzeDamageOverTime());
-        StartCoroutine(DamageProjectionGenerator()); 
+        StartCoroutine(DamageProjectionGenerator());
         InvokeRepeating(nameof(CalculateTurretEfficiency), 8f, 8f);
         InvokeRepeating(nameof(GeneratePerformanceReport), 10f, 10f);
         InvokeRepeating(nameof(CalculateAdvancedStats), 12f, 12f);
+        InvokeRepeating(nameof(AnalyzeEnemyTypes), 5f, 5f);
     }
 
     void Update()
@@ -68,7 +69,7 @@ public class TurretController : MonoBehaviour
         }
         //
         else
-        //LINQ NACHO: primero ve si esta vivo, despues calcula la distancia, los ordena por cercania y los manda a una lista
+            //LINQ NACHO: primero ve si esta vivo, despues calcula la distancia, los ordena por cercania y los manda a una lista
         {
             var targets = allEnemies
                 .Where(enemy => enemy.IsAlive)
@@ -77,7 +78,7 @@ public class TurretController : MonoBehaviour
                 .ToList();
 
             if (targets.Any())
-            //ataca al primero de la lista
+                //ataca al primero de la lista
             {
                 AttackTarget(targets.First());
                 lastShotTime = Time.time;
@@ -92,11 +93,11 @@ public class TurretController : MonoBehaviour
 
         target.health -= damage;
 
-       
+
         stats.totalDamage += damage;
         stats.damageHistory.Add(damage);
 
-        // TUPLA: agrega el saño y el tiempo
+        // TUPLA: agrega el saï¿½o y el tiempo
         stats.damageTimeline.Add((damage, Time.time));
 
         if (enemyWasAlive && target.health <= 0)
@@ -112,14 +113,14 @@ public class TurretController : MonoBehaviour
     IEnumerator AnalyzeDamageOverTime()
     {
         while (true)
-        //Lo mantiene siempre loopeando 
+            //Lo mantiene siempre loopeando 
         {
             yield return new WaitForSeconds(5f);
 
             // TIME SLICING NACHO: solo se hyace una vez cada 5 seg
 
             if (stats.damageTimeline.Count > 0)
-            //Pregunta si hice daño
+                //Pregunta si hice daï¿½o
             {
                 int batchSize = 10;
                 //cantidad de objetos que voy a revisar por analisis
@@ -134,18 +135,18 @@ public class TurretController : MonoBehaviour
                     // divide los objetos en grupos de 10, saltaendo lo que ya reviso (agarra el siguiente grupo de 10 posible)
                     var batch = stats.damageTimeline.Skip(i).Take(batchSize);
 
-                    // TUPLAS NACHO: daño y Tiempo 
+                    // TUPLAS NACHO: daï¿½o y Tiempo 
                     float batchDamage = batch.Sum(tuple => tuple.damage);
-                    //calcula cuanto daño se hizo en el grupo de 10
+                    //calcula cuanto daï¿½o se hizo en el grupo de 10
                     float timeSpan = batch.Any() ? batch.Last().time - batch.First().time : 0f;
                     // si hya algun objeto en el batch devuelve el margen entre tiempos, si no hay objetos devuelve 0
                     totalAnalyzed += batchDamage;
-                    //le suma al daño total, el daño del batch actual
+                    //le suma al daï¿½o total, el daï¿½o del batch actual
                     batches++;
 
                     // Muestro lo que calcule con las tuplas en consola
                     if (timeSpan > 0)
-                    //si en algun lapso hice daño, calcula el dps
+                        //si en algun lapso hice daï¿½o, calcula el dps
                     {
                         float dps = batchDamage / timeSpan;
                         Debug.Log($"[{turretName}] Batch DPS: {dps:F1} (Damage: {batchDamage}, Time: {timeSpan:F1}s)");
@@ -158,7 +159,7 @@ public class TurretController : MonoBehaviour
         }
     }
 
-    //LINQ
+    //LINQ Mar
     public void CalculateTurretEfficiency() // Agarra las stasts de la torreta
     {
         var recentDamage = stats.damageTimeline
@@ -177,14 +178,16 @@ public class TurretController : MonoBehaviour
         tuttetDPS.text = $"{efficiency:F2} DPS";
     }
 
-    // TIPO ANÓNIMO NACHO: Genera reporte de acción de disparo
+    //end Mar
+
+    // TIPO ANï¿½NIMO NACHO: Genera reporte de acciï¿½n de disparo
     public void GeneratePerformanceReport()
     {
         if (stats.damageTimeline.Count == 0) return;
 
-        // TIPO ANÓNIMO: Información sobre la acción de disparo
+        // TIPO ANï¿½NIMO: Informaciï¿½n sobre la acciï¿½n de disparo
         var shootingReport = stats.damageTimeline
-            .TakeLast(20) // Últimos 20 disparos
+            .TakeLast(20) // ï¿½ltimos 20 disparos
             .Select(tuple => new
             {
                 Damage = tuple.damage,
@@ -197,7 +200,7 @@ public class TurretController : MonoBehaviour
             .ToList();
 
         if (shootingReport.Any())
-        //levanta el daño para dar la performance,dando un resumen general de las estadisticas de los ataques.
+            //levanta el daï¿½o para dar la performance,dando un resumen general de las estadisticas de los ataques.
         {
             var summary = new
             {
@@ -209,18 +212,18 @@ public class TurretController : MonoBehaviour
             };
 
             Debug.Log($"[Performance Report] {summary.TurretName}: {summary.HighDamageShots} high-damage shots, " +
-                     $"Total: {summary.TotalHighDamage}, Performance: {summary.Performance}");
+                      $"Total: {summary.TotalHighDamage}, Performance: {summary.Performance}");
         }
     }
 
-    // AGGREGATE NACHO: Calcula estadísticas complejas usando Aggregate
+    // AGGREGATE NACHO: Calcula estadï¿½sticas complejas usando Aggregate
     public void CalculateAdvancedStats()
     {
         if (stats.damageHistory.Count == 0) return;
 
-        //AGGREGATE: Combina múltiples cálculos en una sola operación
+        //AGGREGATE: Combina mï¿½ltiples cï¿½lculos en una sola operaciï¿½n
         var complexStats = stats.damageHistory
-            .TakeLast(15) // Últimos 15 disparos
+            .TakeLast(15) // ï¿½ltimos 15 disparos
             .Aggregate(
                 new { TotalDamage = 0f, MaxDamage = 0f, ShotCount = 0, DamageVariation = 0f }, // Valor inicial
                 (accumulator, damage) => new
@@ -228,9 +231,9 @@ public class TurretController : MonoBehaviour
                     TotalDamage = accumulator.TotalDamage + damage,
                     MaxDamage = damage > accumulator.MaxDamage ? damage : accumulator.MaxDamage,
                     ShotCount = accumulator.ShotCount + 1,
-                    DamageVariation = accumulator.DamageVariation + Mathf.Abs(damage - 20f) // Variación del daño base
+                    DamageVariation = accumulator.DamageVariation + Mathf.Abs(damage - 20f) // Variaciï¿½n del daï¿½o base
                 },
-                result => new // Transformación final
+                result => new // Transformaciï¿½n final
                 {
                     AverageDamage = result.ShotCount > 0 ? result.TotalDamage / result.ShotCount : 0f,
                     MaxDamage = result.MaxDamage,
@@ -240,20 +243,20 @@ public class TurretController : MonoBehaviour
             );
 
         Debug.Log($"[Advanced Stats - {turretName}] Avg: {complexStats.AverageDamage:F1}, " +
-                 $"Max: {complexStats.MaxDamage:F1}, Consistency: {complexStats.Consistency:F1}%, " +
-                 $"Shots: {complexStats.TotalShots}");
+                  $"Max: {complexStats.MaxDamage:F1}, Consistency: {complexStats.Consistency:F1}%, " +
+                  $"Shots: {complexStats.TotalShots}");
     }
 
-    // GENERATOR NACHO: Genera proyecciones de daño futuro de forma lazy
+    // GENERATOR NACHO: Genera proyecciones de daï¿½o futuro de forma lazy
     IEnumerator DamageProjectionGenerator()
     {
         while (true)
         {
-            yield return new WaitForSeconds(7f); // Cada 7 segundos genera proyección
+            yield return new WaitForSeconds(7f); // Cada 7 segundos genera proyecciï¿½n
 
             if (stats.damageHistory.Count >= 5) // Necesita al menos 5 disparos para proyectar
             {
-                // Generator que calcula daño proyectado para los próximos 5 disparos
+                // Generator que calcula daï¿½o proyectado para los prï¿½ximos 5 disparos
                 var projections = GenerateFutureDamageProjections()
                     .Take(5) // Solo los primeros 5
                     .ToList(); // Consume el generator
@@ -264,7 +267,7 @@ public class TurretController : MonoBehaviour
                     float avgProjected = projections.Average();
 
                     Debug.Log($"[Damage Generator - {turretName}] Next 5 shots projected: " +
-                             $"Total: {totalProjected:F1}, Avg: {avgProjected:F1}");
+                              $"Total: {totalProjected:F1}, Avg: {avgProjected:F1}");
                 }
             }
 
@@ -272,25 +275,45 @@ public class TurretController : MonoBehaviour
         }
     }
 
-    // GENERATOR HELPER: Genera valores de daño proyectado infinitamente
+    // GENERATOR HELPER: Genera valores de daÃ±o proyectado infinitamente
     IEnumerable<float> GenerateFutureDamageProjections()
     {
         float baseDamage = 20f;
-        var recentDamages = stats.damageHistory.TakeLast(5); // Últimos 5 para calcular tendencia
+        var recentDamages = stats.damageHistory.TakeLast(5); // Ultimos 5 para calcular tendencia
 
         float trend = recentDamages.Any() ? recentDamages.Average() : baseDamage;
         int shotNumber = 1;
 
         while (true) // Generator infinito
         {
-            // Proyecta daño basado en tendencia + variación por shot
-            float projectedDamage = trend + (shotNumber * 0.5f) - 2.5f; // Pequeña variación
-            projectedDamage = Mathf.Max(projectedDamage, baseDamage * 0.8f); // Mínimo 80% del daño base
+            // Proyecta daÃ±o basado en tendencia + variacion por shot
+            float projectedDamage = trend + (shotNumber * 0.5f) - 2.5f; // PequeÃ±a variacion
+            projectedDamage = Mathf.Max(projectedDamage, baseDamage * 0.8f); // Monimo 80% del daï¿½o base
 
             yield return projectedDamage; // Genera el siguiente valor
             shotNumber++;
 
-            if (shotNumber > 100) shotNumber = 1; // Reset para evitar números muy grandes
+            if (shotNumber > 100) shotNumber = 1; // Reset para evitar numeros muy grandes
+        }
+    }
+
+
+    // Mar LINQ 3
+    public void AnalyzeEnemyTypes()
+    {
+        var allEnemies = FindObjectsOfType<Enemy>();
+
+        var enemyAnalysis = allEnemies
+            .Where(enemy => enemy.reward > 10) // Busca los enemigoas q su recompensaa sea m ayor a 10
+            .OrderBy(enemy => enemy.reward) // Los ordena de manor a mayor recomepnsa
+            .ToList(); // lo pas a una lista
+
+        Debug.Log($"[{turretName}] Enemigos con recompensa menor a 10: {enemyAnalysis.Count}");
+
+        if (enemyAnalysis.Count > 0)
+        {
+            Debug.Log($"[{turretName}](Mar) Menor recompensa filtrada: {enemyAnalysis.First().reward}");
+            Debug.Log($"[{turretName}](Mar) Mayor recompensa filtrada: {enemyAnalysis.Last().reward}");
         }
     }
 }
