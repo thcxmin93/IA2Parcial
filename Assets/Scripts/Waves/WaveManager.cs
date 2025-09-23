@@ -65,10 +65,12 @@ public class WaveManager : MonoBehaviour
         // Time slicing
         StartCoroutine(SpawnInBatches(enemyList, batchSize, perSpawnDelay));
 
-        
+
         InvokeRepeating(nameof(AnalyzeWaveComposition), 3f, 10f);
+        // Al final del Start(), después del InvokeRepeating existente:
+        InvokeRepeating(nameof(AnalyzeEnemyPerformance), 6f, 6f);
     }
-    
+
     private IEnumerable<EnemyBlueprint> GenerateEnemyWave(int count, int minReward, int maxReward)
     {
         for (int i = 1; i <= count; i++)
@@ -80,7 +82,7 @@ public class WaveManager : MonoBehaviour
             };
         }
     }
-    
+
     IEnumerator SpawnInBatches(List<EnemyBlueprint> wave, int chunk, float delay)
     {
         int spawned = 0;
@@ -115,7 +117,7 @@ public class WaveManager : MonoBehaviour
 
             spawned += slice.Count;
         }
-    }//end Pedro
+    } //end Pedro
 
     //  MAR LINQ
     public void AnalyzeWaveComposition()
@@ -141,6 +143,39 @@ public class WaveManager : MonoBehaviour
         }
     }
 
+    //mAR
+    public void AnalyzeEnemyPerformance()
+    {
+        var allEnemies = FindObjectsOfType<Enemy>();
+
+        if (allEnemies.Length == 0) return;
+
+        // Aggregate QUE CALCULA EL RENDIMIENTO DE LOS ENEMIGOS
+        var performance = allEnemies.Aggregate(
+            new { TotalReward = 0, TotalHealth = 0f, Count = 0 }, // Valor inicial
+            (acc, enemy) => new
+            {
+                TotalReward = acc.TotalReward + enemy.reward,
+                TotalHealth = acc.TotalHealth + enemy.health,
+                Count = acc.Count + 1
+            },
+            result => new
+            {
+                result.TotalReward,
+                result.TotalHealth,
+                result.Count,
+                AvgReward = result.Count > 0 ? result.TotalReward / (float)result.Count : 0f,
+                AvgHealth = result.Count > 0 ? result.TotalHealth / result.Count : 0f
+            }
+        );
+
+        Debug.Log($"Enemigos analizados: {performance.Count}");
+        Debug.Log($"Recompensa promedio: {performance.AvgReward:F1}");
+        Debug.Log($"Salud promedio: {performance.AvgHealth:F1}");
+        Debug.Log($"Total oro en campo: {performance.TotalReward}");
+    }
+
+    //ENDmAR
     void OnDrawGizmosSelected()
     {
         if (!spawnPoint) return;
